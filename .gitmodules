@@ -1,3 +1,0 @@
-[submodule "thesis_pv_emulator_imgui/vendor/"]
-	path = thesis_pv_emulator_imgui/vendor/
-	url = https://github.com/ocornut/imgui.git
