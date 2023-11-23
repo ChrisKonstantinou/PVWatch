@@ -6,15 +6,28 @@
 
 void PV::PVModule::ClearCurrentArray()
 {
-	for (int i = 0; i < NUMBER_OF_POINTS; i++)
+	for (int i = 0; i < this->steps; i++)
 	{
 		this->current_array[i] = 0.0;
 		this->voltage_array[i] = 0.0;
 	}
+	//free(this->current_array);
+	//free(this->voltage_array);
+	//free(this->power_array);
 }
 
-void PV::PVModule::CalculateCurrentArray(float v_oc,float i_sc, float v_mp, float i_mp, float g, float t_e)
+void PV::PVModule::CalculateCurrentArray(float v_oc,float i_sc, float v_mp, float i_mp, float g, float t_e, int steps, int iterations)
 {
+	// Set up calculation parameters
+	this->steps = steps;
+	this->iters = iterations;
+
+	// Set up current, voltage, and power arrays
+	this->current_array = new double[this->steps >= 0 ? this->steps : 0];
+	this->voltage_array = new double[this->steps >= 0 ? this->steps : 0];
+	this->power_array	= new double[this->steps >= 0 ? this->steps : 0];
+
+	// Set up intrinsic PV parameters
 	this->Voc	= (double)v_oc;
 	this->Isc	= (double)i_sc;
 	this->Vmp	= (double)v_mp;
@@ -50,7 +63,7 @@ void PV::PVModule::CalculateCurrentArray(float v_oc,float i_sc, float v_mp, floa
 
 
 	//Calculate Rs based on the above mentioned paper
-	for (int i = 0; i < MAX_ITERATIONS; i++)
+	for (int i = 0; i < this->iters; i++)
 	{
 		double eq_10_num = this->a * this->Vthermal * this->Vmp * (2 * this->Imp - this->Isc);
 		double eq_10_den = (this->Vmp * this->Isc + this->Voc * (this->Imp - this->Isc)) * 
@@ -77,22 +90,40 @@ void PV::PVModule::CalculateCurrentArray(float v_oc,float i_sc, float v_mp, floa
 	this->Ipv = ((this->Rsh + this->Rs) / this->Rsh) * this->Isc;
 
 	//Fill V array and zero the I array
-	for (int i = 0; i < NUMBER_OF_POINTS; i++)
+	for (int i = 0; i < this->steps; i++)
 	{
-		this->voltage_array[i] = (double)i*this->Voc/(double)(NUMBER_OF_POINTS - 1);
+		this->voltage_array[i] = (double)i*this->Voc/(double)(this->steps - 1);
 		this->current_array[i] = 0;
 	}
 
-	for (int i = 0; i < NUMBER_OF_POINTS; i++)
+	for (int i = 0; i < this->steps; i++)
 	{
-		for (int j = 0; j < MAX_ITERATIONS; j++)
+		for (int j = 0; j < this->iters; j++)
 		{
-			double voltageAtThisPoint = (double)i * this->Voc / (double)(NUMBER_OF_POINTS - 1);
+			double voltageAtThisPoint = (double)i * this->Voc / (double)(this->steps - 1);
 			//float voltageAtThisPoint = this->voltageLookUpTable[i];
 			double exponent_value = (voltageAtThisPoint + this->current_array[i] * this->Rs) / (this->a * this->Vthermal);
 			double term1 = this->I0 * (exp(exponent_value) - 1);
 			double term2 = (voltageAtThisPoint + this->current_array[i] * this->Rs) / this->Rsh;
 			this->current_array[i] = this->Ipv - term1 - term2;
 		}
+		
+		// Fill the power array
+		this->power_array[i] = this->voltage_array[i] * this->current_array[i];
 	}
+}
+
+double* PV::PVModule::GetCurrentArray()
+{
+	return this->current_array;
+}
+
+double* PV::PVModule::GetVoltageArray()
+{
+	return this->voltage_array;
+}
+
+double* PV::PVModule::GetPowerArray()
+{
+	return this->power_array;
 }
