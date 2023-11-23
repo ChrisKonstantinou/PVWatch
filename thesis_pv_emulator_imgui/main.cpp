@@ -77,10 +77,20 @@ int main(int, char**)
     ImGui_ImplDX9_Init(g_pd3dDevice);
 
     // Our state
-    bool show_main_window = true;
-    bool show_app_fullscreen = false;
+    bool show_values_input_window = true;
+    bool show_pv_plot = true;
+    bool show_examples = true;
 
-    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+    ImVec4 clear_color = ImVec4(0.08f, 0.20f, 0.27f, 1.00f);
+
+    // PV parameters
+    float v_oc = 0.0;
+    float i_sc = 0.0;
+    float v_mp = 0.0;
+    float i_mp = 0.0;
+
+    float g = 1000.0f;
+    float t_e = 25;
 
     // Main loop
     bool done = false;
@@ -113,30 +123,43 @@ int main(int, char**)
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();
 
-        if (show_app_fullscreen)
+        if (show_examples)
         {
-            MainApp(&show_app_fullscreen);
+            ImGui::ShowDemoWindow(&show_examples);
         }
 
-        // Show Main Window.
-        if (show_main_window)
+        // Show Plot Window
+        if (show_pv_plot)
         {
-            static float f = 0.0f;
-            static int counter = 0;
-
-            ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
-
-            ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
+            ImGui::Begin("Voltage - Current Plot");
             
-            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-            ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+            ImGui::End();
+        }
 
-            if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-                counter++;
-            ImGui::SameLine();
-            ImGui::Text("counter = %d", counter);
+        // Show Value Inputs.
+        if (show_values_input_window)
+        {
+            ImGui::Begin("Input Parameters");
 
+            ImGui::SeparatorText("PV Static IV Characteristics");
+            ImGui::InputScalar("Voltage (OC) (V)", ImGuiDataType_Float, &v_oc, NULL);
+            ImGui::InputScalar("Current (SC) (A)", ImGuiDataType_Float, &i_sc, NULL);
+            ImGui::InputScalar("Voltage (MP) (V)", ImGuiDataType_Float, &v_mp, NULL);
+            ImGui::InputScalar("Current (MP) (A)", ImGuiDataType_Float, &i_mp, NULL);
+            
+            ImGui::SeparatorText("PV Enviromental Parameters");
+            ImGui::InputScalar("Irradiance (G) (W/m2)", ImGuiDataType_Float, &g, NULL);
+            ImGui::InputScalar("Temperature (T) (C)", ImGuiDataType_Float, &t_e, NULL);
+
+            ImGui::Separator();
+            ImGui::AlignTextToFramePadding();
+            ImGui::Button("Plot"); ImGui::SameLine();
+            ImGui::Button("Export Data");
+            
+            ImGui::SeparatorText("GUI Settings");
+            ImGui::ColorEdit3("Background Color", (float*)&clear_color);
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+
             ImGui::End();
         }
 
@@ -240,7 +263,7 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     return ::DefWindowProcW(hWnd, msg, wParam, lParam);
 }
 
-void MainApp(bool* p_open)
+void MainAppFullScreen(bool* p_open)
 {
     static bool use_work_area = true;
     static ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings;
