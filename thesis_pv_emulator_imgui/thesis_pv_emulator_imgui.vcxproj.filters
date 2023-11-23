@@ -48,6 +48,9 @@
     <ClCompile Include="vendors\ImPlot\implot_items.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PV\src\pv.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="vendors\ImGui\imstb_truetype.h">
@@ -78,6 +81,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="vendors\ImPlot\implot_internal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PV\include\pv.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

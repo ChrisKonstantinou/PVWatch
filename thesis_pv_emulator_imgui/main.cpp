@@ -13,19 +13,20 @@
 #include <d3d9.h>
 #include <tchar.h>
 
+#include "PV/include/pv.h"
+
 // Data
 static LPDIRECT3D9              g_pD3D = nullptr;
 static LPDIRECT3DDEVICE9        g_pd3dDevice = nullptr;
 static UINT                     g_ResizeWidth = 0, g_ResizeHeight = 0;
 static D3DPRESENT_PARAMETERS    g_d3dpp = {};
 
+int main(int, char**);
+
 // Forward declarations of helper functions
 bool CreateDeviceD3D(HWND hWnd);
 void CleanupDeviceD3D();
 void ResetDevice();
-
-// Main App Ref
-void MainApp(bool*);
 
 LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -164,7 +165,12 @@ int main(int, char**)
 
             ImGui::Separator();
             ImGui::AlignTextToFramePadding();
-            ImGui::Button("Plot"); ImGui::SameLine();
+            if (ImGui::Button("Plot"))
+            {
+                PV::DebugLog("It Works!!");
+            }
+            
+            ImGui::SameLine();
             ImGui::Button("Export Data");
             
             ImGui::SeparatorText("GUI Settings");
@@ -274,22 +280,4 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         return 0;
     }
     return ::DefWindowProcW(hWnd, msg, wParam, lParam);
-}
-
-void MainAppFullScreen(bool* p_open)
-{
-    static bool use_work_area = true;
-    static ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings;
-
-    // We demonstrate using the full viewport area or the work area (without menu-bars, task-bars etc.)
-    // Based on your use case you may want one or the other.
-    const ImGuiViewport* viewport = ImGui::GetMainViewport();
-    ImGui::SetNextWindowPos(use_work_area ? viewport->WorkPos : viewport->Pos);
-    ImGui::SetNextWindowSize(use_work_area ? viewport->WorkSize : viewport->Size);
-
-    if (ImGui::Begin("PV fs", p_open, flags))
-    {
-        
-    }
-    ImGui::End();
 }
