@@ -80,7 +80,7 @@ int main(int, char**)
     // Our state
     bool show_values_input_window = true;
     bool show_pv_plot = true;
-    bool show_examples = true;
+    bool show_examples = false;
 
     ImVec4 clear_color = ImVec4(0.08f, 0.20f, 0.27f, 1.00f);
 
