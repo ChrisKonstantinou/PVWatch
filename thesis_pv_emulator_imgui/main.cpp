@@ -30,6 +30,9 @@ void ResetDevice();
 
 LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
+// Public HEAP PV object
+PV::PVModule pvModule;
+
 // Main code
 int main(int, char**)
 {
@@ -84,21 +87,18 @@ int main(int, char**)
     // Our state
     bool show_values_input_window = true;
     bool show_pv_plot = true;
-    bool show_examples = true;
+    bool show_examples = false;
 
     ImVec4 clear_color = ImVec4(0.08f, 0.20f, 0.27f, 1.00f);
 
     // PV parameters
-    float v_oc = 0.0;
-    float i_sc = 0.0;
-    float v_mp = 0.0;
-    float i_mp = 0.0;
+    float v_oc = 35.0;
+    float i_sc = 9;
+    float v_mp = 30.0;
+    float i_mp = 8.5;
 
     float g = 1000.0f;
     float t_e = 25;
-
-    // Plot parameters
-    int bar_data[5] = { 1, 2, 3, 4, 5 };
 
     // Main loop
     bool done = false;
@@ -134,15 +134,24 @@ int main(int, char**)
         if (show_examples)
         {
             ImGui::ShowDemoWindow(&show_examples);
+            ImPlot::ShowDemoWindow();
         }
 
         // Show Plot Window
         if (show_pv_plot)
         {
+            //static ImPlotAxisFlags xflags = ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_RangeFit;
+            //static ImPlotAxisFlags yflags = ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_RangeFit;
+
             ImGui::Begin("Voltage - Current Plot");
-            if (ImPlot::BeginPlot("PV Plot"))
+            if (ImPlot::BeginPlot("PV Plot", ImVec2(-1, -1)))
             {
-                ImPlot::PlotBars("Bar Data", bar_data, 5);
+                ImPlot::SetupAxes("Voltage (V)", "Current (A)");
+                ImPlot::SetupAxesLimits(0, 1.1 * v_oc, 0, 1.1 * i_sc);
+                //ImPlot::SetupAxisZoomConstraints(ImAxis_X1, 1, 1);
+                //ImPlot::SetupAxisZoomConstraints(ImAxis_Y1, 1, 1);
+
+                ImPlot::PlotLine("I-V plot", pvModule.voltage_array, pvModule.current_array, NUMBER_OF_POINTS);
                 ImPlot::EndPlot();
             }
             ImGui::End();
@@ -165,13 +174,13 @@ int main(int, char**)
 
             ImGui::Separator();
             ImGui::AlignTextToFramePadding();
-            if (ImGui::Button("Plot"))
-            {
-                PV::DebugLog("It Works!!");
-            }
+            if (ImGui::Button("Plot")) pvModule.CalculateCurrentArray(v_oc, i_sc, v_mp, i_mp, g, t_e);
             
             ImGui::SameLine();
-            ImGui::Button("Export Data");
+            if (ImGui::Button("Clear")) pvModule.ClearCurrentArray();
+
+            ImGui::SameLine();
+            ImGui::Button("EXPORT plot");
             
             ImGui::SeparatorText("GUI Settings");
             ImGui::ColorEdit3("Background Color", (float*)&clear_color);
