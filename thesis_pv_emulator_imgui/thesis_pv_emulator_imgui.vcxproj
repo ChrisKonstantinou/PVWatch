@@ -72,7 +72,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(ProjectDir)\Vendors\ImGui\;$(ProjectDir)\Vendors\ImGui\backends\;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)\Vendors\ImGui\;$(ProjectDir)\Vendors\ImGui\backends\;$(ProjectDir)\Vendors\ImPlot\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -149,6 +149,9 @@
     <ClCompile Include="vendors\ImGui\imgui_draw.cpp" />
     <ClCompile Include="vendors\ImGui\imgui_tables.cpp" />
     <ClCompile Include="vendors\ImGui\imgui_widgets.cpp" />
+    <ClCompile Include="vendors\ImPlot\implot.cpp" />
+    <ClCompile Include="vendors\ImPlot\implot_demo.cpp" />
+    <ClCompile Include="vendors\ImPlot\implot_items.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="vendors\ImGui\backends\imgui_impl_dx9.h" />
@@ -159,6 +162,8 @@
     <ClInclude Include="vendors\ImGui\imstb_rectpack.h" />
     <ClInclude Include="vendors\ImGui\imstb_textedit.h" />
     <ClInclude Include="vendors\ImGui\imstb_truetype.h" />
+    <ClInclude Include="vendors\ImPlot\implot.h" />
+    <ClInclude Include="vendors\ImPlot\implot_internal.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

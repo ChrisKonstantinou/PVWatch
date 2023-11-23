@@ -1,3 +1,7 @@
 [submodule "thesis_pv_emulator_imgui/vendors/ImGui"]
     path = thesis_pv_emulator_imgui/vendors/ImGui
     url = https://github.com/ocornut/imgui
+
+[submodule "thesis_pv_emulator_imgui/vendors/ImPlot"]
+    path = thesis_pv_emulator_imgui/vendors/ImPlot
+    url = https://github.com/epezent/implot

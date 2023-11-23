@@ -7,6 +7,7 @@
 // - Introduction, links and more at the top of imgui.cpp
 
 #include "imgui.h"
+#include "implot.h"
 #include "imgui_impl_dx9.h"
 #include "imgui_impl_win32.h"
 #include <d3d9.h>
@@ -76,6 +77,9 @@ int main(int, char**)
     ImGui_ImplWin32_Init(hwnd);
     ImGui_ImplDX9_Init(g_pd3dDevice);
 
+    // Setup ImPlot Context
+    ImPlot::CreateContext();
+
     // Our state
     bool show_values_input_window = true;
     bool show_pv_plot = true;
@@ -91,6 +95,9 @@ int main(int, char**)
 
     float g = 1000.0f;
     float t_e = 25;
+
+    // Plot parameters
+    int bar_data[5] = { 1, 2, 3, 4, 5 };
 
     // Main loop
     bool done = false;
@@ -132,7 +139,11 @@ int main(int, char**)
         if (show_pv_plot)
         {
             ImGui::Begin("Voltage - Current Plot");
-            
+            if (ImPlot::BeginPlot("PV Plot"))
+            {
+                ImPlot::PlotBars("Bar Data", bar_data, 5);
+                ImPlot::EndPlot();
+            }
             ImGui::End();
         }
 
@@ -186,6 +197,8 @@ int main(int, char**)
     ImGui_ImplDX9_Shutdown();
     ImGui_ImplWin32_Shutdown();
     ImGui::DestroyContext();
+
+    ImPlot::DestroyContext();
 
     CleanupDeviceD3D();
     ::DestroyWindow(hwnd);
