@@ -6,16 +6,6 @@
 
 void PV::PVModule::ClearCurrentArray()
 {
-	//for (int i = 0; i < this->steps; i++)
-	//{
-	//	this->current_array[i] = 0.0;
-	//	this->voltage_array[i] = 0.0;
-	//}
-
-	//free(this->current_array);
-	//free(this->voltage_array);
-	//free(this->power_array);
-
 	delete[] this->current_array;
 	delete[] this->voltage_array;
 	delete[] this->power_array;
@@ -107,15 +97,12 @@ void PV::PVModule::CalculateIVPArrays(float v_oc,float i_sc, float v_mp, float i
 	this->Ipv_nom = ((this->Rsh + this->Rs) / this->Rsh) * this->Isc_nom;
 	this->Ipv = (this->G / this->G_nom) * this->Ipv_nom;
 
-	//Fill V array and zero the I array
 	for (int i = 0; i < this->steps; i++)
 	{
-		this->voltage_array[i] = (double)i*this->Voc/(double)(this->steps - 1);
+		//Fill V array and zero the I array
+		this->voltage_array[i] = (double)i * this->Voc / (double)(this->steps - 1);
 		this->current_array[i] = 0;
-	}
 
-	for (int i = 0; i < this->steps; i++)
-	{
 		for (int j = 0; j < this->iters; j++)
 		{
 			double voltageAtThisPoint = (double)i * this->Voc / (double)(this->steps - 1);
@@ -132,11 +119,6 @@ void PV::PVModule::CalculateIVPArrays(float v_oc,float i_sc, float v_mp, float i
 		// Fill the power array
 		this->power_array[i] = this->voltage_array[i] * this->current_array[i];
 	}
-}
-
-void PV::PVModule::CalculateIVPArrays(float v_oc, float i_sc, float v_mp, float i_mp)
-{
-
 }
 
 double* PV::PVModule::GetCurrentArray()

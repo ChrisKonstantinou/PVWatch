@@ -14,19 +14,14 @@ namespace PV
 	class PVModule
 	{
 	public:
+		const static double G_nominal;
+
 		/*
 			Calculate I, V, P arrays using analytical method.
 			Inputs: Voc (V), Isc (A), Vmp (V), Isc (A), The irradiance G in W/m2, and the cell temperature
 			Output: void (Writes the current data to the this.current_array [float array]
 		*/
 		void CalculateIVPArrays(float v_oc, float i_sc, float v_mp, float i_mp, float g, float t_e, int steps, int iterations);
-
-		/*
-			Calculate Nominal I, V, P arrays using analytical method.
-			Inputs: Voc (V), Isc (A), Vmp (V), Isc (A)
-			Output: TODO
-		*/
-		void CalculateIVPArrays(float v_oc, float i_sc, float v_mp, float i_mp);
 
 		/*
 			Clears the current array
