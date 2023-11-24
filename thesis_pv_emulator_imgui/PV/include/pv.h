@@ -15,11 +15,18 @@ namespace PV
 	{
 	public:
 		/*
-			Calculate current array using analytical method.
+			Calculate I, V, P arrays using analytical method.
 			Inputs: Voc (V), Isc (A), Vmp (V), Isc (A), The irradiance G in W/m2, and the cell temperature
 			Output: void (Writes the current data to the this.current_array [float array]
 		*/
-		void CalculateCurrentArray(float v_oc, float i_sc, float v_mp, float i_mp, float g, float t_e, int steps, int iterations);
+		void CalculateIVPArrays(float v_oc, float i_sc, float v_mp, float i_mp, float g, float t_e, int steps, int iterations);
+
+		/*
+			Calculate Nominal I, V, P arrays using analytical method.
+			Inputs: Voc (V), Isc (A), Vmp (V), Isc (A)
+			Output: TODO
+		*/
+		void CalculateIVPArrays(float v_oc, float i_sc, float v_mp, float i_mp);
 
 		/*
 			Clears the current array
@@ -40,11 +47,9 @@ namespace PV
 			Get the Power Array
 		*/
 		double* GetPowerArray();
-
 	
 	private:
 		// PV internal parameters
-
 		double Voc;
 		double Isc;
 		double Vmp;
@@ -53,6 +58,16 @@ namespace PV
 		double G;
 		double T;
 
+		// Nominal Parameters
+		double Voc_nom;
+		double Isc_nom;
+		double Vmp_nom;
+		double Imp_nom;
+
+		double G_nom;
+		double T_nom;
+
+		// ----- //
 		double Vthermal;
 		double Rsh;
 		double Rs;
@@ -62,7 +77,8 @@ namespace PV
 		double Np;
 		double idealityFactor;
 
-		float Ipv;
+		double Ipv;
+		double Ipv_nom;
 
 		// Calculation parameters
 		int steps;
