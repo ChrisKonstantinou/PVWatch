@@ -60,11 +60,13 @@ int main(int, char**)
     ::UpdateWindow(hwnd);
 
     // Setup Dear ImGui context
-    IMGUI_CHECKVERSION();
+    // IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // Enable Docking
+    // io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
 
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
@@ -78,8 +80,11 @@ int main(int, char**)
     ImPlot::CreateContext();
 
     // Our state
+    
     bool show_values_input_window = true;
     bool show_pv_plot = true;
+    bool show_iv_plot = true;
+
     bool show_examples = false;
 
     ImVec4 clear_color = ImVec4(0.08f, 0.20f, 0.27f, 1.00f);
@@ -128,6 +133,8 @@ int main(int, char**)
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();
 
+        ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
+
         if (show_examples)
         {
             ImGui::ShowDemoWindow(&show_examples);
@@ -135,10 +142,11 @@ int main(int, char**)
         }
 
         // Show Plot Window
-        if (show_pv_plot)
+        if (show_iv_plot)
         {
-            ImGui::Begin("Current / Power - Voltage Plot");
-            if (ImPlot::BeginPlot("I-V Plot", ImVec2(-1, 0)))
+            ImGui::Begin("Current - Voltage Plot");
+            
+            if (ImPlot::BeginPlot("I-V Plot", ImVec2(-1, -1)))
             {
 
                 ImPlot::SetupAxes("Voltage (V)", "Current (A)");
@@ -153,7 +161,12 @@ int main(int, char**)
                 
                 ImPlot::EndPlot();
             }
+            ImGui::End();
+        }
 
+        if (show_pv_plot)
+        {
+            ImGui::Begin("Power - Voltage Plot");
             if (ImPlot::BeginPlot("P-V Plot", ImVec2(-1, -1)))
             {
 
@@ -166,7 +179,6 @@ int main(int, char**)
 
                 ImPlot::EndPlot();
             }
-
             ImGui::End();
         }
 
