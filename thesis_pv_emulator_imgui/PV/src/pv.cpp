@@ -6,14 +6,23 @@
 
 void PV::PVModule::ClearCurrentArray()
 {
-	for (int i = 0; i < this->steps; i++)
-	{
-		this->current_array[i] = 0.0;
-		this->voltage_array[i] = 0.0;
-	}
+	//for (int i = 0; i < this->steps; i++)
+	//{
+	//	this->current_array[i] = 0.0;
+	//	this->voltage_array[i] = 0.0;
+	//}
+
 	//free(this->current_array);
 	//free(this->voltage_array);
 	//free(this->power_array);
+
+	delete[] this->current_array;
+	delete[] this->voltage_array;
+	delete[] this->power_array;
+
+	this->current_array = new double[0];
+	this->voltage_array = new double[0];
+	this->power_array = new double[0];
 }
 
 void PV::PVModule::CalculateCurrentArray(float v_oc,float i_sc, float v_mp, float i_mp, float g, float t_e, int steps, int iterations)

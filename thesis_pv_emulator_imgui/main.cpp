@@ -211,7 +211,12 @@ int main(int, char**)
                 
             
             ImGui::SameLine();
-            if (ImGui::Button("Clear")) pvModule.ClearCurrentArray();
+            if (ImGui::Button("Clear"))
+            {
+                voltage_steps = 0;
+                prev_voltage_steps = 0;
+                pvModule.ClearCurrentArray();
+            }
 
             ImGui::SameLine();
             ImGui::Button("EXPORT plot");
