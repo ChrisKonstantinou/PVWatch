@@ -23,8 +23,9 @@ void ResetDevice();
 
 LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-// Public HEAP PV object
+// Public HEAP PV objects
 PV::PVModule pvModule;
+PV::PVModule pvModuleNominal;
 
 // Main code
 int main(int, char**)
@@ -81,7 +82,7 @@ int main(int, char**)
 
     // Our state
     
-    bool show_values_input_window = true;
+    bool show_nominal_curves = false;
 
     bool show_examples = false;
 
@@ -98,7 +99,7 @@ int main(int, char**)
 
     int voltage_steps = 0; // WARNING: This must be always zero as an initial value
     int prev_voltage_steps = 0;
-    int iterrations = 10;
+    int iterrations = 50;
 
     // Main loop
     bool done = false;
@@ -179,6 +180,11 @@ int main(int, char**)
         ImGui::Button("EXPORT plot");
 
         ImGui::SeparatorText("GUI Settings");
+        if (ImGui::Checkbox("Show Nominal Curves", &show_nominal_curves))
+        {
+            // Create the nominal curves
+            pvModuleNominal.CalculateIVPArrays(v_oc, i_sc, v_mp, i_mp, 1000, 25, 150, 50);
+        }
 
         //ImGui::ColorEdit3("Background Color", (float*)&clear_color);
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
@@ -198,6 +204,13 @@ int main(int, char**)
             ImPlot::TagY(i_mp, ImVec4(0, 1, 1, 1), "%s", "Imp");
 
             ImPlot::PushStyleVar(ImPlotStyleVar_FillAlpha, 0.20f);
+
+            if (show_nominal_curves)
+            {
+                ImPlot::PlotShaded("I-V plot", pvModuleNominal.GetVoltageArray(), pvModuleNominal.GetCurrentArray(), 150);
+                ImPlot::PlotLine("I-V plot", pvModuleNominal.GetVoltageArray(), pvModuleNominal.GetCurrentArray(), 150);
+            }
+
             ImPlot::PlotShaded("I-V plot", pvModule.GetVoltageArray(), pvModule.GetCurrentArray(), prev_voltage_steps);
             ImPlot::PlotLine("I-V plot", pvModule.GetVoltageArray(), pvModule.GetCurrentArray(), prev_voltage_steps);
 
@@ -214,6 +227,13 @@ int main(int, char**)
             ImPlot::SetupAxesLimits(0, 1.1 * v_oc, 0, 1.1 * i_sc * v_oc);
 
             ImPlot::PushStyleVar(ImPlotStyleVar_FillAlpha, 0.20f);
+
+            if (show_nominal_curves)
+            {
+                ImPlot::PlotShaded("P-V plot", pvModuleNominal.GetVoltageArray(), pvModuleNominal.GetPowerArray(), 150);
+                ImPlot::PlotLine("P-V plot", pvModuleNominal.GetVoltageArray(), pvModuleNominal.GetPowerArray(), 150);
+            }
+
             ImPlot::PlotShaded("P-V plot", pvModule.GetVoltageArray(), pvModule.GetPowerArray(), prev_voltage_steps);
             ImPlot::PlotLine("P-V plot", pvModule.GetVoltageArray(), pvModule.GetPowerArray(), prev_voltage_steps);
 
