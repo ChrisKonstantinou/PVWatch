@@ -82,8 +82,6 @@ int main(int, char**)
     // Our state
     
     bool show_values_input_window = true;
-    bool show_pv_plot = true;
-    bool show_iv_plot = true;
 
     bool show_examples = false;
 
@@ -141,88 +139,91 @@ int main(int, char**)
             ImPlot::ShowDemoWindow(&show_examples);
         }
 
-        // Show Plot Window
-        if (show_iv_plot)
+        // ---------------------------------------------------------------------------------------------------
+        // ---------------------------------------------------------------------------------------------------
+        // ---------------------------------------------------------------------------------------------------
+        // PARAMETER PANEL
+        ImGui::Begin("Input Parameters");
+
+        ImGui::SeparatorText("PV Static IV Params");
+        ImGui::InputScalar("Voltage (OC) (V)", ImGuiDataType_Float, &v_oc, NULL);
+        ImGui::InputScalar("Current (SC) (A)", ImGuiDataType_Float, &i_sc, NULL);
+        ImGui::InputScalar("Voltage (MP) (V)", ImGuiDataType_Float, &v_mp, NULL);
+        ImGui::InputScalar("Current (MP) (A)", ImGuiDataType_Float, &i_mp, NULL);
+
+        ImGui::SeparatorText("PV Enviromental Params");
+        ImGui::InputScalar("Irradiance (G) (W/m2)", ImGuiDataType_Float, &g, NULL);
+        ImGui::InputScalar("Temperature (T) (C)", ImGuiDataType_Float, &t_e, NULL);
+
+        ImGui::SeparatorText("Method Params");
+        ImGui::InputScalar("Voltage Steps", ImGuiDataType_S32, &voltage_steps, NULL);
+        ImGui::InputScalar("Iterrations / Step", ImGuiDataType_S32, &iterrations, NULL);
+
+        ImGui::Separator();
+        ImGui::AlignTextToFramePadding();
+        if (ImGui::Button("Plot"))
         {
-            ImGui::Begin("Current - Voltage Plot");
-            
-            if (ImPlot::BeginPlot("I-V Plot", ImVec2(-1, -1)))
-            {
-
-                ImPlot::SetupAxes("Voltage (V)", "Current (A)");
-                ImPlot::SetupAxesLimits(0, 1.1 * v_oc, 0, 1.1 * i_sc);
-
-                ImPlot::TagX(v_mp, ImVec4(0, 1, 1, 1), "%s", "Vmp");
-                ImPlot::TagY(i_mp, ImVec4(0, 1, 1, 1), "%s", "Imp");
-
-                ImPlot::PushStyleVar(ImPlotStyleVar_FillAlpha, 0.20f);
-                ImPlot::PlotShaded("I-V plot", pvModule.GetVoltageArray(), pvModule.GetCurrentArray(), prev_voltage_steps);
-                ImPlot::PlotLine("I-V plot", pvModule.GetVoltageArray(), pvModule.GetCurrentArray(), prev_voltage_steps);
-                
-                ImPlot::EndPlot();
-            }
-            ImGui::End();
+            pvModule.CalculateIVPArrays(v_oc, i_sc, v_mp, i_mp, g, t_e, voltage_steps, iterrations);
+            prev_voltage_steps = voltage_steps;
         }
 
-        if (show_pv_plot)
+        ImGui::SameLine();
+        if (ImGui::Button("Clear"))
         {
-            ImGui::Begin("Power - Voltage Plot");
-            if (ImPlot::BeginPlot("P-V Plot", ImVec2(-1, -1)))
-            {
-
-                ImPlot::SetupAxes("Voltage (V)", "Power (W)");
-                ImPlot::SetupAxesLimits(0, 1.1 * v_oc, 0, 1.1 * i_sc * v_oc);
-
-                ImPlot::PushStyleVar(ImPlotStyleVar_FillAlpha, 0.20f);
-                ImPlot::PlotShaded("P-V plot", pvModule.GetVoltageArray(), pvModule.GetPowerArray(), prev_voltage_steps);
-                ImPlot::PlotLine("P-V plot", pvModule.GetVoltageArray(), pvModule.GetPowerArray(), prev_voltage_steps);
-
-                ImPlot::EndPlot();
-            }
-            ImGui::End();
+            voltage_steps = 0;
+            prev_voltage_steps = 0;
+            pvModule.ClearCurrentArray();
         }
 
-        // Show Value Inputs.
-        if (show_values_input_window)
+        ImGui::SameLine();
+        ImGui::Button("EXPORT plot");
+
+        ImGui::SeparatorText("GUI Settings");
+
+        //ImGui::ColorEdit3("Background Color", (float*)&clear_color);
+        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+
+        ImGui::End();
+
+        // RENDER CURRENT VOLTAGE PLOT
+        ImGui::Begin("Current - Voltage Plot");
+
+        if (ImPlot::BeginPlot("I-V Plot", ImVec2(-1, -1)))
         {
-            ImGui::Begin("Input Parameters");
 
-            ImGui::SeparatorText("PV Static IV Params");
-            ImGui::InputScalar("Voltage (OC) (V)", ImGuiDataType_Float, &v_oc, NULL);
-            ImGui::InputScalar("Current (SC) (A)", ImGuiDataType_Float, &i_sc, NULL);
-            ImGui::InputScalar("Voltage (MP) (V)", ImGuiDataType_Float, &v_mp, NULL);
-            ImGui::InputScalar("Current (MP) (A)", ImGuiDataType_Float, &i_mp, NULL);
-            
-            ImGui::SeparatorText("PV Enviromental Params");
-            ImGui::InputScalar("Irradiance (G) (W/m2)", ImGuiDataType_Float, &g, NULL);
-            ImGui::InputScalar("Temperature (T) (C)", ImGuiDataType_Float, &t_e, NULL);
+            ImPlot::SetupAxes("Voltage (V)", "Current (A)");
+            ImPlot::SetupAxesLimits(0, 1.1 * v_oc, 0, 1.1 * i_sc);
 
-            ImGui::SeparatorText("Method Params");
-            ImGui::InputScalar("Voltage Steps", ImGuiDataType_S32, &voltage_steps, NULL);
-            ImGui::InputScalar("Iterrations / Step", ImGuiDataType_S32, &iterrations, NULL);
+            ImPlot::TagX(v_mp, ImVec4(0, 1, 1, 1), "%s", "Vmp");
+            ImPlot::TagY(i_mp, ImVec4(0, 1, 1, 1), "%s", "Imp");
 
-            ImGui::Separator();
-            ImGui::AlignTextToFramePadding();
-            if (ImGui::Button("Plot"))
-            {
-                pvModule.CalculateCurrentArray(v_oc, i_sc, v_mp, i_mp, g, t_e, voltage_steps, iterrations);
-                prev_voltage_steps = voltage_steps;
-            }
-                
-            
-            ImGui::SameLine();
-            if (ImGui::Button("Clear")) pvModule.ClearCurrentArray();
+            ImPlot::PushStyleVar(ImPlotStyleVar_FillAlpha, 0.20f);
+            ImPlot::PlotShaded("I-V plot", pvModule.GetVoltageArray(), pvModule.GetCurrentArray(), prev_voltage_steps);
+            ImPlot::PlotLine("I-V plot", pvModule.GetVoltageArray(), pvModule.GetCurrentArray(), prev_voltage_steps);
 
-            ImGui::SameLine();
-            ImGui::Button("EXPORT plot");
-
-            ImGui::SeparatorText("GUI Settings");
-            ImGui::ColorEdit3("Background Color", (float*)&clear_color);
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-
-            ImGui::End();
+            ImPlot::EndPlot();
         }
+        ImGui::End();
 
+        // RENDER POWER VOLTAGE PLOT
+        ImGui::Begin("Power - Voltage Plot");
+        if (ImPlot::BeginPlot("P-V Plot", ImVec2(-1, -1)))
+        {
+
+            ImPlot::SetupAxes("Voltage (V)", "Power (W)");
+            ImPlot::SetupAxesLimits(0, 1.1 * v_oc, 0, 1.1 * i_sc * v_oc);
+
+            ImPlot::PushStyleVar(ImPlotStyleVar_FillAlpha, 0.20f);
+            ImPlot::PlotShaded("P-V plot", pvModule.GetVoltageArray(), pvModule.GetPowerArray(), prev_voltage_steps);
+            ImPlot::PlotLine("P-V plot", pvModule.GetVoltageArray(), pvModule.GetPowerArray(), prev_voltage_steps);
+
+            ImPlot::EndPlot();
+        }
+        ImGui::End();
+
+        // ---------------------------------------------------------------------------------------------------
+        // ---------------------------------------------------------------------------------------------------
+        // ---------------------------------------------------------------------------------------------------
         // Rendering
         ImGui::EndFrame();
         g_pd3dDevice->SetRenderState(D3DRS_ZENABLE, FALSE);
