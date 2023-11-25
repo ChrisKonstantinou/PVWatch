@@ -46,6 +46,12 @@ namespace PV
 			Get the Power Array
 		*/
 		double* GetPowerArray();
+
+		/*
+			Get current value from the voltage, Implements also a linear approximation between
+			two closest values.
+		*/
+		double GetCurrentFromVoltage(double);
 	
 	private:
 		// PV internal parameters

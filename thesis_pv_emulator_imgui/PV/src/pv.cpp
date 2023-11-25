@@ -135,3 +135,28 @@ double* PV::PVModule::GetPowerArray()
 {
 	return this->power_array;
 }
+
+double PV::PVModule::GetCurrentFromVoltage(double voltage)
+{
+	if (this->steps <= 1) return this->Isc;
+
+	double real_voltage = (voltage > this->Voc) ? this->Voc : voltage;
+
+	double approx_voltage_idx = real_voltage / (this->Voc / (this->steps - 1));
+
+	int voltage_floor_idx = (int)floor(approx_voltage_idx);
+	int voltage_ceil_idx = (int)ceil(approx_voltage_idx);
+
+	double voltage_floor = this->voltage_array[voltage_floor_idx];
+	double voltage_ceil = this->voltage_array[voltage_ceil_idx];
+
+	double current_floor = this->current_array[voltage_floor_idx];
+	double current_ceil = this->current_array[voltage_ceil_idx];
+
+	// Calculate semi linear current through the slope of the floor and ceil currents
+	double slope = (current_ceil - current_floor) / (voltage_ceil - voltage_floor);
+	
+	double current = ((real_voltage - voltage_floor) * slope) + current_floor;
+
+	return current;
+}
