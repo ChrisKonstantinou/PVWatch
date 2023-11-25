@@ -16,12 +16,12 @@ extern PV::PVModule pvModule; // main PV module handle
 
 AsyncCommunication::AsyncCommunication()
 {
-	std::cout << "AsyncCommunication Initialized" << std::endl;
+	// std::cout << "AsyncCommunication Initialized" << std::endl;
 }
 
 AsyncCommunication::~AsyncCommunication()
 {
-	std::cout << "AsyncCommunication Destroyed" << std::endl;
+	// std::cout << "AsyncCommunication Destroyed" << std::endl;
 }
 
 
