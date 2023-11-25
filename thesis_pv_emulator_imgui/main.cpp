@@ -94,8 +94,8 @@ int main(int, char**)
     float v_mp = 30.0;
     float i_mp = 8.5;
 
-    float g = 1000.0f;
-    float t_e = 25;
+    float g     = PV::G_nominal;
+    float t_e   = PV::T_nominal;
 
     int voltage_steps = 0; // WARNING: This must be always zero as an initial value
     int prev_voltage_steps = 0;
@@ -183,7 +183,16 @@ int main(int, char**)
         if (ImGui::Checkbox("Show Nominal Curves", &show_nominal_curves))
         {
             // Create the nominal curves
-            pvModuleNominal.CalculateIVPArrays(v_oc, i_sc, v_mp, i_mp, 1000, 25, 150, 50);
+            pvModuleNominal.CalculateIVPArrays(
+                v_oc,
+                i_sc,
+                v_mp,
+                i_mp,
+                PV::G_nominal,
+                PV::T_nominal,
+                PV::STEPS_nominal,
+                PV::ITERS_nominal
+            );
         }
 
         //ImGui::ColorEdit3("Background Color", (float*)&clear_color);
@@ -205,14 +214,14 @@ int main(int, char**)
 
             ImPlot::PushStyleVar(ImPlotStyleVar_FillAlpha, 0.20f);
 
-            if (show_nominal_curves)
-            {
-                ImPlot::PlotShaded("I-V plot", pvModuleNominal.GetVoltageArray(), pvModuleNominal.GetCurrentArray(), 150);
-                ImPlot::PlotLine("I-V plot", pvModuleNominal.GetVoltageArray(), pvModuleNominal.GetCurrentArray(), 150);
-            }
-
             ImPlot::PlotShaded("I-V plot", pvModule.GetVoltageArray(), pvModule.GetCurrentArray(), prev_voltage_steps);
             ImPlot::PlotLine("I-V plot", pvModule.GetVoltageArray(), pvModule.GetCurrentArray(), prev_voltage_steps);
+
+            if (show_nominal_curves)
+            {
+                ImPlot::PlotShaded("I-V plot Nominal", pvModuleNominal.GetVoltageArray(), pvModuleNominal.GetCurrentArray(), PV::STEPS_nominal);
+                ImPlot::PlotLine("I-V plot Nominal", pvModuleNominal.GetVoltageArray(), pvModuleNominal.GetCurrentArray(), PV::STEPS_nominal);
+            }
 
             ImPlot::EndPlot();
         }
@@ -228,14 +237,14 @@ int main(int, char**)
 
             ImPlot::PushStyleVar(ImPlotStyleVar_FillAlpha, 0.20f);
 
-            if (show_nominal_curves)
-            {
-                ImPlot::PlotShaded("P-V plot", pvModuleNominal.GetVoltageArray(), pvModuleNominal.GetPowerArray(), 150);
-                ImPlot::PlotLine("P-V plot", pvModuleNominal.GetVoltageArray(), pvModuleNominal.GetPowerArray(), 150);
-            }
-
             ImPlot::PlotShaded("P-V plot", pvModule.GetVoltageArray(), pvModule.GetPowerArray(), prev_voltage_steps);
             ImPlot::PlotLine("P-V plot", pvModule.GetVoltageArray(), pvModule.GetPowerArray(), prev_voltage_steps);
+
+            if (show_nominal_curves)
+            {
+                ImPlot::PlotShaded("P-V plot Nominal", pvModuleNominal.GetVoltageArray(), pvModuleNominal.GetPowerArray(), PV::STEPS_nominal);
+                ImPlot::PlotLine("P-V plot Nominal", pvModuleNominal.GetVoltageArray(), pvModuleNominal.GetPowerArray(), PV::STEPS_nominal);
+            }
 
             ImPlot::EndPlot();
         }
