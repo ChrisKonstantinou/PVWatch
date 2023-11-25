@@ -11,10 +11,14 @@
 
 namespace PV
 {
+	static float G_nominal = 1000.0;
+	static float T_nominal = 25.0;
+	static int STEPS_nominal = 200;
+	static int ITERS_nominal = 50;
+
 	class PVModule
 	{
 	public:
-		const static double G_nominal;
 
 		/*
 			Calculate I, V, P arrays using analytical method.
