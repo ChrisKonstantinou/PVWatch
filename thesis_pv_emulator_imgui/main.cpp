@@ -7,6 +7,10 @@
 
 #include "pv/include/pv.h"
 #include <iostream>
+#include <thread>
+#include <mutex>
+
+#include "async_com/include/async_com.h"
 
 // Data
 static LPDIRECT3D9              g_pD3D = nullptr;
@@ -26,6 +30,13 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 // Public HEAP PV objects
 PV::PVModule pvModule;
 PV::PVModule pvModuleNominal;
+
+// Real time rendering value pair and Async Communication
+double rt_v[1];
+double rt_i[1];
+double rt_p[1];
+
+std::mutex mtx;
 
 // Main code
 int main(int, char**)
@@ -82,8 +93,8 @@ int main(int, char**)
 
     // Our state
     
+    bool show_real_time_pairs = true;
     bool show_nominal_curves = false;
-
     bool show_examples = false;
 
     ImVec4 clear_color = ImVec4(0.08f, 0.20f, 0.27f, 1.00f);
@@ -100,6 +111,10 @@ int main(int, char**)
     int voltage_steps = 0; // WARNING: This must be always zero as an initial value
     int prev_voltage_steps = 0;
     int iterrations = 50;
+
+    // Setup Async Communication Thread
+    std::thread t(&AsyncCommunication::Test, AsyncCommunication());
+    t.detach();
 
     // Main loop
     bool done = false;
@@ -180,6 +195,7 @@ int main(int, char**)
         ImGui::Button("EXPORT plot");
 
         ImGui::SeparatorText("GUI Settings");
+        ImGui::Checkbox("Show real-time pairs", &show_real_time_pairs);
         if (ImGui::Checkbox("Show Nominal Curves", &show_nominal_curves))
         {
             // Create the nominal curves
@@ -209,13 +225,16 @@ int main(int, char**)
             ImPlot::SetupAxes("Voltage (V)", "Current (A)");
             ImPlot::SetupAxesLimits(0, 1.1 * v_oc, 0, 1.1 * i_sc);
 
-            ImPlot::TagX(v_mp, ImVec4(0, 1, 1, 1), "%s", "Vmp");
-            ImPlot::TagY(i_mp, ImVec4(0, 1, 1, 1), "%s", "Imp");
+            // ImPlot::TagX(v_mp, ImVec4(0, 1, 1, 1), "%s", "Vmp");
+            // ImPlot::TagY(i_mp, ImVec4(0, 1, 1, 1), "%s", "Imp");
 
             ImPlot::PushStyleVar(ImPlotStyleVar_FillAlpha, 0.20f);
 
             ImPlot::PlotShaded("I-V plot", pvModule.GetVoltageArray(), pvModule.GetCurrentArray(), prev_voltage_steps);
             ImPlot::PlotLine("I-V plot", pvModule.GetVoltageArray(), pvModule.GetCurrentArray(), prev_voltage_steps);
+
+            // Show real time
+            if (show_real_time_pairs) ImPlot::PlotScatter("Real Time (IV)", rt_v, rt_i, 1);
 
             if (show_nominal_curves)
             {
@@ -239,6 +258,9 @@ int main(int, char**)
 
             ImPlot::PlotShaded("P-V plot", pvModule.GetVoltageArray(), pvModule.GetPowerArray(), prev_voltage_steps);
             ImPlot::PlotLine("P-V plot", pvModule.GetVoltageArray(), pvModule.GetPowerArray(), prev_voltage_steps);
+
+            // Show real time
+            if (show_real_time_pairs) ImPlot::PlotScatter("Real Time (PV)", rt_v, rt_p, 1);
 
             if (show_nominal_curves)
             {
@@ -282,6 +304,7 @@ int main(int, char**)
     CleanupDeviceD3D();
     ::DestroyWindow(hwnd);
     ::UnregisterClassW(wc.lpszClassName, wc.hInstance);
+
 
     return 0;
 }

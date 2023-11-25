@@ -143,6 +143,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="async_com\src\async_com.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="pv\src\pv.cpp" />
     <ClCompile Include="vendors\ImGui\backends\imgui_impl_dx9.cpp" />
@@ -157,6 +158,7 @@
     <ClCompile Include="vendors\ImPlot\implot_items.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="async_com\include\async_com.h" />
     <ClInclude Include="pv\include\pv.h" />
     <ClInclude Include="vendors\ImGui\backends\imgui_impl_dx9.h" />
     <ClInclude Include="vendors\ImGui\backends\imgui_impl_win32.h" />
