@@ -1,6 +1,9 @@
 #include <iostream>
 #include <random>
 #include <math.h>
+#include <thread>
+#include <chrono>
+
 #include "../include/pv.h"
 
 
@@ -159,4 +162,44 @@ double PV::PVModule::GetCurrentFromVoltage(double voltage)
 	double current = ((real_voltage - voltage_floor) * slope) + current_floor;
 
 	return current;
+}
+
+
+void PV::Simulator::Simulation(double G_start, double G_stop, double T_start, double T_stop, double time_secs, double sim_steps)
+{
+	// EXEI THEMA TO FIX LATER
+	this->G_start = G_start;
+	this->G_stop = G_stop;
+	this->T_start = T_start;
+	this->T_stop = T_stop;
+	this->time_secs = time_secs;
+	this->sim_steps = sim_steps;
+
+	// Get the current displayed pv module
+	extern PVModule pvModule;
+
+	std::cout << "Simulation started" << std::endl;
+
+	double G_step = abs(this->G_stop - this->G_start) / this->sim_steps;
+	double T_step = abs(this->T_stop - this->T_start) / this->sim_steps;
+
+	int time_in_millis = (int)floor((1000 * this->time_secs) / this->sim_steps);
+
+	for (int i = 0; i < this->sim_steps; i++)
+	{
+		pvModule.CalculateIVPArrays(
+			pvModule.Voc,
+			pvModule.Isc,
+			pvModule.Vmp,
+			pvModule.Imp,
+			this->G_start + G_step * (double)i,
+			this->T_start + T_step * (double)i,
+			pvModule.steps,
+			pvModule.iters
+		);
+		
+		std::this_thread::sleep_for(std::chrono::microseconds(time_in_millis));
+	}
+
+	return;
 }

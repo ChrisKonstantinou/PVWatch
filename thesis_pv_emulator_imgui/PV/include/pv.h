@@ -19,6 +19,18 @@ namespace PV
 	class PVModule
 	{
 	public:
+		// PV internal parameters
+		double Voc;
+		double Isc;
+		double Vmp;
+		double Imp;
+
+		double G;
+		double T;
+
+		// Calculation parameters
+		int steps;
+		int iters;
 
 		/*
 			Calculate I, V, P arrays using analytical method.
@@ -51,17 +63,9 @@ namespace PV
 			Get current value from the voltage, Implements also a linear approximation between
 			two closest values.
 		*/
-		double GetCurrentFromVoltage(double);
+		double GetCurrentFromVoltage(double voltage);
 	
 	private:
-		// PV internal parameters
-		double Voc;
-		double Isc;
-		double Vmp;
-		double Imp;
-
-		double G;
-		double T;
 
 		// Nominal Parameters
 		double Voc_nom;
@@ -85,14 +89,30 @@ namespace PV
 		double Ipv;
 		double Ipv_nom;
 
-		// Calculation parameters
-		int steps;
-		int iters;
-
 		// Array pointers
 		double* current_array;
 		double* voltage_array;
 		double* power_array;
 	};
 
+	class Simulator
+	{
+	public:
+		// Maybe add here the extern handle to the current PV module
+		// And add the extern handle of the sim_progress
+
+		/*
+			Start a simulation sweeping values for G and T from G_start to G_stop, T_start and T_stop
+			in a set time (seconds) time_secs
+		*/
+		void Simulation(double G_start, double G_stop, double T_start, double T_stop, double time_secs, double sim_steps);
+	
+	private:
+		double G_start;
+		double G_stop;
+		double T_start;
+		double T_stop;
+		double time_secs;
+		double sim_steps;
+	};
 }
