@@ -101,18 +101,23 @@ namespace PV
 		// Maybe add here the extern handle to the current PV module
 		// And add the extern handle of the sim_progress
 
+		bool enable_simulation;
+		bool thread_active;
+
+		Simulator();
+
 		/*
 			Start a simulation sweeping values for G and T from G_start to G_stop, T_start and T_stop
 			in a set time (seconds) time_secs
 		*/
-		void Simulation(double G_start, double G_stop, double T_start, double T_stop, double time_secs, double sim_steps);
+		void Simulation(float G_start, float G_stop, float T_start, float T_stop, float time_secs, int sim_steps);
 	
 	private:
-		double G_start;
-		double G_stop;
-		double T_start;
-		double T_stop;
-		double time_secs;
-		double sim_steps;
+		float G_start;
+		float G_stop;
+		float T_start;
+		float T_stop;
+		float time_secs;
+		int sim_steps;
 	};
 }

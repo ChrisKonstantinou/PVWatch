@@ -164,42 +164,106 @@ double PV::PVModule::GetCurrentFromVoltage(double voltage)
 	return current;
 }
 
-
-void PV::Simulator::Simulation(double G_start, double G_stop, double T_start, double T_stop, double time_secs, double sim_steps)
+PV::Simulator::Simulator()
 {
-	// EXEI THEMA TO FIX LATER
-	this->G_start = G_start;
-	this->G_stop = G_stop;
-	this->T_start = T_start;
-	this->T_stop = T_stop;
+	this->enable_simulation = true;
+	this->thread_active = false;
+}
+
+void PV::Simulator::Simulation(float G_start, float G_stop, float T_start, float T_stop, float time_secs, int sim_steps)
+{
+	// Enable the simulation thread flag;
+	this->enable_simulation = true;
+	
+	// Prevent doublicate threads
+	this->thread_active = true;
+
+	this->G_start	= G_start;
+	this->G_stop	= G_stop;
+	this->T_start	= T_start;
+	this->T_stop	= T_stop;
 	this->time_secs = time_secs;
 	this->sim_steps = sim_steps;
 
 	// Get the current displayed pv module
 	extern PVModule pvModule;
 
-	std::cout << "Simulation started" << std::endl;
+	// Get the current progress bar variable
+	extern float sim_progress;
 
-	double G_step = abs(this->G_stop - this->G_start) / this->sim_steps;
-	double T_step = abs(this->T_stop - this->T_start) / this->sim_steps;
+	// Set the initial state of the PV module to G_start and T_start
+	double current_v_oc = pvModule.Voc;
+	double current_i_sc = pvModule.Isc;
+	double current_v_mp = pvModule.Vmp;
+	double current_i_mp = pvModule.Imp;
 
-	int time_in_millis = (int)floor((1000 * this->time_secs) / this->sim_steps);
+	int current_pv_parameter_calc_steps = pvModule.steps;
+	int current_pv_parameter_calc_inter = pvModule.iters;
+
+	pvModule.CalculateIVPArrays(
+		current_v_oc,
+		current_i_sc,
+		current_v_mp,
+		current_i_mp,
+		this->G_start,
+		this->T_start,
+		current_pv_parameter_calc_steps,
+		current_pv_parameter_calc_inter
+	);
+
+
+	float G_step = (this->G_stop - this->G_start) / this->sim_steps;
+	float T_step = (this->T_stop - this->T_start) / this->sim_steps;
+
+	int time_in_millis = (int)ceil((1000 * this->time_secs) / this->sim_steps);
+
+	float sim_g = this->G_start;
+	float sim_t = this->T_start;
 
 	for (int i = 0; i < this->sim_steps; i++)
 	{
+		if (!this->enable_simulation)
+		{
+			// Update the progress bar
+			sim_progress = 0;
+			this->thread_active = false;
+			return;
+		}
+
 		pvModule.CalculateIVPArrays(
 			pvModule.Voc,
 			pvModule.Isc,
 			pvModule.Vmp,
 			pvModule.Imp,
-			this->G_start + G_step * (double)i,
-			this->T_start + T_step * (double)i,
+			sim_g,
+			sim_t,
 			pvModule.steps,
 			pvModule.iters
 		);
 		
-		std::this_thread::sleep_for(std::chrono::microseconds(time_in_millis));
+		sim_g += G_step;
+		sim_t += T_step;
+
+		// Update the progress bar
+		sim_progress = (float)i / (float)this->sim_steps;
+
+		std::this_thread::sleep_for(std::chrono::milliseconds(time_in_millis));
 	}
+
+	// Set the stop parameters
+
+	pvModule.CalculateIVPArrays(
+		current_v_oc,
+		current_i_sc,
+		current_v_mp,
+		current_i_mp,
+		this->G_stop,
+		this->T_stop,
+		current_pv_parameter_calc_steps,
+		current_pv_parameter_calc_inter
+	);
+
+	this->thread_active = false;
 
 	return;
 }
