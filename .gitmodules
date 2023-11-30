@@ -1,6 +1,6 @@
 [submodule "thesis_pv_emulator_imgui/vendors/ImGui"]
     path = thesis_pv_emulator_imgui/vendors/ImGui
-    url = https://github.com/ocornut/imgui
+    url = https://github.com/ocornut/imgui/tree/docking
 
 [submodule "thesis_pv_emulator_imgui/vendors/ImPlot"]
     path = thesis_pv_emulator_imgui/vendors/ImPlot

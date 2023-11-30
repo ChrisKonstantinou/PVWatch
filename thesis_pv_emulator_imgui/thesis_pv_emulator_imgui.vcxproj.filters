@@ -48,7 +48,10 @@
     <ClCompile Include="vendors\ImPlot\implot_items.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PV\src\pv.cpp">
+    <ClCompile Include="pv\src\pv.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="async_com\src\async_com.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -83,7 +86,10 @@
     <ClInclude Include="vendors\ImPlot\implot_internal.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PV\include\pv.h">
+    <ClInclude Include="pv\include\pv.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="async_com\include\async_com.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
