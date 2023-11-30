@@ -38,6 +38,9 @@ double rt_p[1];
 
 std::mutex mtx;
 
+// Simulation Progress
+float sim_progress = 0;
+
 // Main code
 int main(int, char**)
 {
@@ -114,14 +117,12 @@ int main(int, char**)
     int iterrations = 50;
 
     // Simulation parameters
-    float sim_g_start = 0;
-    float sim_g_stop = 0;
-    float sim_t_start = 0;
-    float sim_t_stop = 0;
-    float sim_time_s = 1;
-    int sim_steps = 100;
-
-    float sim_progress = 0;
+    float sim_g_start   = 800;
+    float sim_g_stop    = 1000;
+    float sim_t_start   = 25;
+    float sim_t_stop    = 40;
+    float sim_time_s    = 10;
+    int sim_steps       = 70;
 
     // Setup Async Communication Thread
     std::thread t(&AsyncCommunication::Test, AsyncCommunication());
@@ -177,32 +178,38 @@ int main(int, char**)
         {
             ImGui::Begin("Simulation");
             ImGui::SeparatorText("Parameters");
-            ImGui::InputScalar("G Min", ImGuiDataType_Float, &sim_g_start, NULL);
-            ImGui::InputScalar("G Max", ImGuiDataType_Float, &sim_g_stop, NULL);
-            ImGui::InputScalar("T Min", ImGuiDataType_Float, &sim_t_start, NULL);
-            ImGui::InputScalar("T Max", ImGuiDataType_Float, &sim_t_stop, NULL);
+            ImGui::InputScalar("G Start", ImGuiDataType_Float, &sim_g_start, NULL);
+            ImGui::InputScalar("G Stop", ImGuiDataType_Float, &sim_g_stop, NULL);
+            ImGui::InputScalar("T Start", ImGuiDataType_Float, &sim_t_start, NULL);
+            ImGui::InputScalar("T Stop", ImGuiDataType_Float, &sim_t_stop, NULL);
             ImGui::InputScalar("Total time", ImGuiDataType_Float, &sim_time_s, NULL);
-            ImGui::InputScalar("STEPS", ImGuiDataType_S32, &sim_steps, NULL);
+            ImGui::InputScalar("Steps", ImGuiDataType_S32, &sim_steps, NULL);
 
             ImGui::Separator();
 
             if (ImGui::Button("Start"))
             {
-                std::thread sim_t(
-                    &PV::Simulator::Simulation,
-                    &simulator,
-                    sim_g_start,
-                    sim_g_stop,
-                    sim_t_start,
-                    sim_t_stop,
-                    sim_time_s,
-                    sim_steps
-                );
-                sim_t.detach();
+                if (!simulator.thread_active)
+                {
+                    std::thread sim_t(
+                        &PV::Simulator::Simulation,
+                        &simulator,
+                        sim_g_start,
+                        sim_g_stop,
+                        sim_t_start,
+                        sim_t_stop,
+                        sim_time_s,
+                        sim_steps
+                    );
+                    sim_t.detach();
+                }
             }
 
             ImGui::SameLine();
-            ImGui::Button("Stop");
+            if (ImGui::Button("Stop"))
+            {
+                simulator.enable_simulation = false;
+            }
             
             ImGui::ProgressBar(sim_progress, ImVec2(0.0f, 0.0f));
 
