@@ -11,3 +11,6 @@
 ![Main Application Interface](./docs/main_screen.png)
 
 ## Simulation Demo Video
+![Demo Video](./docs/simulation_demo_video.gif)
+
+---
