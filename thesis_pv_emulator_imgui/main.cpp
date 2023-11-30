@@ -38,6 +38,9 @@ double rt_p[1];
 
 std::mutex mtx;
 
+// Simulation Progress
+float sim_progress = 0;
+
 // Main code
 int main(int, char**)
 {
@@ -96,6 +99,7 @@ int main(int, char**)
     bool show_real_time_pairs = true;
     bool show_nominal_curves = false;
     bool show_examples = false;
+    bool show_simulation_panel = true;
 
     ImVec4 clear_color = ImVec4(0.08f, 0.20f, 0.27f, 1.00f);
 
@@ -112,9 +116,20 @@ int main(int, char**)
     int prev_voltage_steps = 0;
     int iterrations = 50;
 
+    // Simulation parameters
+    float sim_g_start   = 800;
+    float sim_g_stop    = 1000;
+    float sim_t_start   = 25;
+    float sim_t_stop    = 40;
+    float sim_time_s    = 10;
+    int sim_steps       = 70;
+
     // Setup Async Communication Thread
     std::thread t(&AsyncCommunication::Test, AsyncCommunication());
     t.detach();
+
+    // Init Simulation Class
+    PV::Simulator simulator;
 
     // Main loop
     bool done = false;
@@ -158,6 +173,50 @@ int main(int, char**)
         // ---------------------------------------------------------------------------------------------------
         // ---------------------------------------------------------------------------------------------------
         // ---------------------------------------------------------------------------------------------------
+        
+        if (show_simulation_panel)
+        {
+            ImGui::Begin("Simulation");
+            ImGui::SeparatorText("Parameters");
+            ImGui::InputScalar("G Start", ImGuiDataType_Float, &sim_g_start, NULL);
+            ImGui::InputScalar("G Stop", ImGuiDataType_Float, &sim_g_stop, NULL);
+            ImGui::InputScalar("T Start", ImGuiDataType_Float, &sim_t_start, NULL);
+            ImGui::InputScalar("T Stop", ImGuiDataType_Float, &sim_t_stop, NULL);
+            ImGui::InputScalar("Total time", ImGuiDataType_Float, &sim_time_s, NULL);
+            ImGui::InputScalar("Steps", ImGuiDataType_S32, &sim_steps, NULL);
+
+            ImGui::Separator();
+
+            if (ImGui::Button("Start"))
+            {
+                if (!simulator.thread_active)
+                {
+                    std::thread sim_t(
+                        &PV::Simulator::Simulation,
+                        &simulator,
+                        sim_g_start,
+                        sim_g_stop,
+                        sim_t_start,
+                        sim_t_stop,
+                        sim_time_s,
+                        sim_steps
+                    );
+                    sim_t.detach();
+                }
+            }
+
+            ImGui::SameLine();
+            if (ImGui::Button("Stop"))
+            {
+                simulator.enable_simulation = false;
+            }
+            
+            ImGui::ProgressBar(sim_progress, ImVec2(0.0f, 0.0f));
+
+            ImGui::End();
+        }
+
+
         // PARAMETER PANEL
         ImGui::Begin("Input Parameters");
 

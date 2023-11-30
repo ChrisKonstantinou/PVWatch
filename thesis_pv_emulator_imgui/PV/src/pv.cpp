@@ -1,6 +1,9 @@
 #include <iostream>
 #include <random>
 #include <math.h>
+#include <thread>
+#include <chrono>
+
 #include "../include/pv.h"
 
 
@@ -159,4 +162,108 @@ double PV::PVModule::GetCurrentFromVoltage(double voltage)
 	double current = ((real_voltage - voltage_floor) * slope) + current_floor;
 
 	return current;
+}
+
+PV::Simulator::Simulator()
+{
+	this->enable_simulation = true;
+	this->thread_active = false;
+}
+
+void PV::Simulator::Simulation(float G_start, float G_stop, float T_start, float T_stop, float time_secs, int sim_steps)
+{
+	// Enable the simulation thread flag;
+	this->enable_simulation = true;
+	
+	// Prevent doublicate threads
+	this->thread_active = true;
+
+	this->G_start	= G_start;
+	this->G_stop	= G_stop;
+	this->T_start	= T_start;
+	this->T_stop	= T_stop;
+	this->time_secs = time_secs;
+	this->sim_steps = sim_steps;
+
+	// Get the current displayed pv module
+	extern PVModule pvModule;
+
+	// Get the current progress bar variable
+	extern float sim_progress;
+
+	// Set the initial state of the PV module to G_start and T_start
+	double current_v_oc = pvModule.Voc;
+	double current_i_sc = pvModule.Isc;
+	double current_v_mp = pvModule.Vmp;
+	double current_i_mp = pvModule.Imp;
+
+	int current_pv_parameter_calc_steps = pvModule.steps;
+	int current_pv_parameter_calc_inter = pvModule.iters;
+
+	pvModule.CalculateIVPArrays(
+		current_v_oc,
+		current_i_sc,
+		current_v_mp,
+		current_i_mp,
+		this->G_start,
+		this->T_start,
+		current_pv_parameter_calc_steps,
+		current_pv_parameter_calc_inter
+	);
+
+
+	float G_step = (this->G_stop - this->G_start) / this->sim_steps;
+	float T_step = (this->T_stop - this->T_start) / this->sim_steps;
+
+	int time_in_millis = (int)ceil((1000 * this->time_secs) / this->sim_steps);
+
+	float sim_g = this->G_start;
+	float sim_t = this->T_start;
+
+	for (int i = 0; i < this->sim_steps; i++)
+	{
+		if (!this->enable_simulation)
+		{
+			// Update the progress bar
+			sim_progress = 0;
+			this->thread_active = false;
+			return;
+		}
+
+		pvModule.CalculateIVPArrays(
+			pvModule.Voc,
+			pvModule.Isc,
+			pvModule.Vmp,
+			pvModule.Imp,
+			sim_g,
+			sim_t,
+			pvModule.steps,
+			pvModule.iters
+		);
+		
+		sim_g += G_step;
+		sim_t += T_step;
+
+		// Update the progress bar
+		sim_progress = (float)i / (float)this->sim_steps;
+
+		std::this_thread::sleep_for(std::chrono::milliseconds(time_in_millis));
+	}
+
+	// Set the stop parameters
+
+	pvModule.CalculateIVPArrays(
+		current_v_oc,
+		current_i_sc,
+		current_v_mp,
+		current_i_mp,
+		this->G_stop,
+		this->T_stop,
+		current_pv_parameter_calc_steps,
+		current_pv_parameter_calc_inter
+	);
+
+	this->thread_active = false;
+
+	return;
 }
