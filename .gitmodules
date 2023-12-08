@@ -1,7 +1,3 @@
-[submodule "pvwatch/vendors/ImGui"]
-    path = pvwatch/vendors/ImGui
-    url = https://github.com/ocornut/imgui/tree/docking
-
 [submodule "pvwatch/vendors/ImPlot"]
     path = pvwatch/vendors/ImPlot
     url = https://github.com/epezent/implot
