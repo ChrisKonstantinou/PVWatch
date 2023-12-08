@@ -143,6 +143,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="app_design\src\app_design.cpp" />
     <ClCompile Include="async_com\src\async_com.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="pv\src\pv.cpp" />
@@ -158,6 +159,7 @@
     <ClCompile Include="vendors\ImPlot\implot_items.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="app_design\include\app_design.h" />
     <ClInclude Include="async_com\include\async_com.h" />
     <ClInclude Include="pv\include\pv.h" />
     <ClInclude Include="vendors\ImGui\backends\imgui_impl_dx9.h" />

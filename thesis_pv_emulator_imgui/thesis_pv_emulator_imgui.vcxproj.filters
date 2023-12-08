@@ -54,6 +54,9 @@
     <ClCompile Include="async_com\src\async_com.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="app_design\src\app_design.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="vendors\ImGui\imstb_truetype.h">
@@ -90,6 +93,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="async_com\include\async_com.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="app_design\include\app_design.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
