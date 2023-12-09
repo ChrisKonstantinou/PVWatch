@@ -5,7 +5,7 @@
 #include <chrono>
 #include <mutex>
 
-extern std::mutex mtx;
+// extern std::mutex mtx;
 
 extern double rt_v[1];
 extern double rt_i[1];
