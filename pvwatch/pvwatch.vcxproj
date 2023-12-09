@@ -73,7 +73,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(ProjectDir)\Vendors\ImGui\;$(ProjectDir)\Vendors\ImGui\backends\;$(ProjectDir)\Vendors\ImPlot\;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)\libraries\ImGui\;$(ProjectDir)\libraries\ImGui\backends\;$(ProjectDir)\libraries\ImPlot\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -146,33 +146,33 @@
   <ItemGroup>
     <ClCompile Include="app_design\src\app_design.cpp" />
     <ClCompile Include="async_com\src\async_com.cpp" />
+    <ClCompile Include="libraries\imgui\backends\imgui_impl_dx9.cpp" />
+    <ClCompile Include="libraries\imgui\backends\imgui_impl_win32.cpp" />
+    <ClCompile Include="libraries\imgui\imgui.cpp" />
+    <ClCompile Include="libraries\imgui\imgui_demo.cpp" />
+    <ClCompile Include="libraries\imgui\imgui_draw.cpp" />
+    <ClCompile Include="libraries\imgui\imgui_tables.cpp" />
+    <ClCompile Include="libraries\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="libraries\implot\implot.cpp" />
+    <ClCompile Include="libraries\implot\implot_demo.cpp" />
+    <ClCompile Include="libraries\implot\implot_items.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="pv\src\pv.cpp" />
-    <ClCompile Include="vendors\ImGui\backends\imgui_impl_dx9.cpp" />
-    <ClCompile Include="vendors\ImGui\backends\imgui_impl_win32.cpp" />
-    <ClCompile Include="vendors\ImGui\imgui.cpp" />
-    <ClCompile Include="vendors\ImGui\imgui_demo.cpp" />
-    <ClCompile Include="vendors\ImGui\imgui_draw.cpp" />
-    <ClCompile Include="vendors\ImGui\imgui_tables.cpp" />
-    <ClCompile Include="vendors\ImGui\imgui_widgets.cpp" />
-    <ClCompile Include="vendors\ImPlot\implot.cpp" />
-    <ClCompile Include="vendors\ImPlot\implot_demo.cpp" />
-    <ClCompile Include="vendors\ImPlot\implot_items.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="app_design\include\app_design.h" />
     <ClInclude Include="async_com\include\async_com.h" />
+    <ClInclude Include="libraries\imgui\backends\imgui_impl_dx9.h" />
+    <ClInclude Include="libraries\imgui\backends\imgui_impl_win32.h" />
+    <ClInclude Include="libraries\imgui\imconfig.h" />
+    <ClInclude Include="libraries\imgui\imgui.h" />
+    <ClInclude Include="libraries\imgui\imgui_internal.h" />
+    <ClInclude Include="libraries\imgui\imstb_rectpack.h" />
+    <ClInclude Include="libraries\imgui\imstb_textedit.h" />
+    <ClInclude Include="libraries\imgui\imstb_truetype.h" />
+    <ClInclude Include="libraries\implot\implot.h" />
+    <ClInclude Include="libraries\implot\implot_internal.h" />
     <ClInclude Include="pv\include\pv.h" />
-    <ClInclude Include="vendors\ImGui\backends\imgui_impl_dx9.h" />
-    <ClInclude Include="vendors\ImGui\backends\imgui_impl_win32.h" />
-    <ClInclude Include="vendors\ImGui\imconfig.h" />
-    <ClInclude Include="vendors\ImGui\imgui.h" />
-    <ClInclude Include="vendors\ImGui\imgui_internal.h" />
-    <ClInclude Include="vendors\ImGui\imstb_rectpack.h" />
-    <ClInclude Include="vendors\ImGui\imstb_textedit.h" />
-    <ClInclude Include="vendors\ImGui\imstb_truetype.h" />
-    <ClInclude Include="vendors\ImPlot\implot.h" />
-    <ClInclude Include="vendors\ImPlot\implot_internal.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
